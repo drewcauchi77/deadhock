@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\DiscordSubscription;
+namespace App\Actions\Subscription;
 
 use App\DTO\SubscriptionDTO;
 use App\Models\Subscription;

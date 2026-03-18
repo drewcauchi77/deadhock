@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\DiscordSubscription\StoreSubscriptionAction;
+use App\Actions\Subscription\StoreSubscriptionAction;
 use App\Actions\VerifyDiscordInteractionAction;
 use App\DTO\SubscriptionDTO;
 use App\Http\Requests\StoreSubscriptionRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 final class DiscordInteractionController extends Controller
 {
@@ -25,6 +26,8 @@ final class DiscordInteractionController extends Controller
             $storeDiscordSubscriptionRequest->string('channel_id')->toString(),
             $storeDiscordSubscriptionRequest->string('guild_id')->toString(),
         ));
+
+        Log::info($storeDiscordSubscriptionRequest);
 
         return response()->json(['test' => true]);
     }

@@ -23,7 +23,7 @@ final class PlayerFactory extends Factory
         ];
     }
 
-    public function unchecked(): PlayerFactory
+    public function unchecked(): self
     {
         return $this->state([
             'last_checked_at' => null,

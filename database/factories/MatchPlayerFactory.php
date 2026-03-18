@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Matches;
+use App\Models\MatchPlayer;
+use App\Models\Player;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Matches>
+ * @extends Factory<MatchPlayer>
  */
-final class MatchesFactory extends Factory
+final class MatchPlayerFactory extends Factory
 {
     /**
      * @return array<string, mixed>
@@ -18,9 +20,8 @@ final class MatchesFactory extends Factory
     public function definition(): array
     {
         return [
-            'match_id' => fake()->numerify('###########'),
-            'match_started_at' => fake()->dateTimeBetween('-7 days', 'now'),
-            'fetched_at' => now(),
+            'match_id' => Matches::factory(),
+            'player_id' => Player::factory(),
         ];
     }
 }

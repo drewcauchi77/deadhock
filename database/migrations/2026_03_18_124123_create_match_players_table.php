@@ -10,12 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('subscription_players', function (Blueprint $table): void {
+        Schema::create('match_players', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('match_id')->constrained('matches')->cascadeOnDelete();
             $table->foreignId('player_id')->constrained()->cascadeOnDelete();
-            $table->string('nice_name', 64);
-            $table->unique(['subscription_id', 'player_id']);
+            $table->unique(['match_id', 'player_id']);
             $table->timestamps();
         });
     }
