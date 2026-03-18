@@ -13,3 +13,6 @@ Route::get('/', fn (): Factory|View => view('welcome'));
 Route::post('/discord/interactions', [DiscordInteractionController::class, 'invoke'])
     ->name('discord.interactions')
     ->middleware(VerifyDiscordSignature::class);
+
+Route::livewire('/matches/{matchId}', 'pages.matches.show')
+    ->name('matches.show');
