@@ -10,10 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tracked_players', function (Blueprint $table): void {
+        Schema::create('subscriptions', function (Blueprint $table): void {
             $table->id();
-            $table->string('steam_id')->unique();
-            $table->timestamp('last_checked_at')->nullable();
+            $table->string('guild_id');
+            $table->string('channel_id');
+            $table->unique(['guild_id', 'channel_id']);
             $table->timestamps();
         });
     }

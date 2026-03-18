@@ -7,7 +7,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-final class StoreDiscordSubscriptionRequest extends FormRequest
+final class StoreSubscriptionRequest extends FormRequest
 {
     public function authorize(): bool
     {

@@ -10,11 +10,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('discord_subscriptions', function (Blueprint $table): void {
+        Schema::create('matches', function (Blueprint $table): void {
             $table->id();
-            $table->string('guild_id');
-            $table->string('channel_id');
-            $table->unique(['guild_id', 'channel_id']);
+            $table->string('match_id')->unique();
+            $table->timestamp('match_started_at')->nullable();
+            $table->timestamp('fetched_at')->useCurrent();
             $table->timestamps();
         });
     }

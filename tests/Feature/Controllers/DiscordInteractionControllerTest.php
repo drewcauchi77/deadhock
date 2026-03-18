@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\VerifyDiscordSignature;
-use App\Models\DiscordSubscription;
+use App\Models\Subscription;
 
 beforeEach(function (): void {
     $this->withoutMiddleware(VerifyDiscordSignature::class);
@@ -24,5 +24,5 @@ it('creates a subscription and returns success for a subscription interaction', 
         ->assertSuccessful()
         ->assertExactJson(['test' => true]);
 
-    expect(DiscordSubscription::query()->count())->toBe(1);
+    expect(Subscription::query()->count())->toBe(1);
 });

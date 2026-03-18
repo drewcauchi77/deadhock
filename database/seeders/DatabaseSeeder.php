@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\DiscordSubscription;
-use App\Models\TrackedPlayer;
+use App\Models\Player;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,9 +21,9 @@ final class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        DiscordSubscription::factory(5)->create();
+        Subscription::factory(5)->create();
 
-        TrackedPlayer::factory(16)->create();
-        TrackedPlayer::factory(4)->unchecked()->create();
+        Player::factory(16)->create();
+        Player::factory(4)->unchecked()->create();
     }
 }

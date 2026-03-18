@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\DiscordSubscription;
+use App\Models\Matches;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<DiscordSubscription>
+ * @extends Factory<Matches>
  */
-final class DiscordSubscriptionFactory extends Factory
+final class MatchesFactory extends Factory
 {
     /**
      * @return array<string, mixed>
@@ -18,8 +18,6 @@ final class DiscordSubscriptionFactory extends Factory
     public function definition(): array
     {
         return [
-            'guild_id' => fake()->md5(),
-            'channel_id' => fake()->md5(),
         ];
     }
 }

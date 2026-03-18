@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\TrackedPlayer;
+use App\Models\Player;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<TrackedPlayer>
+ * @extends Factory<Player>
  */
-final class TrackedPlayerFactory extends Factory
+final class PlayerFactory extends Factory
 {
+    /**
+     * @return array<string, mixed>
+     */
     public function definition(): array
     {
         return [
@@ -20,7 +23,7 @@ final class TrackedPlayerFactory extends Factory
         ];
     }
 
-    public function unchecked(): static
+    public function unchecked(): PlayerFactory
     {
         return $this->state([
             'last_checked_at' => null,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-final class DiscordSubscriptionDTO
+final class SubscriptionDTO
 {
     public function __construct(
         public string $guild_id,
