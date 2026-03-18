@@ -20,10 +20,12 @@ final class StoreSubscriptionRequest extends FormRequest
     public function rules(): array
     {
         $isVerificationPing = $this->integer('type') === 1;
+        $isHookPing = $this->integer('type') === 2;
 
         return [
             'guild_id' => [$isVerificationPing ? 'nullable' : 'required', 'string'],
             'channel_id' => [$isVerificationPing ? 'nullable' : 'required', 'string'],
+            'data.options.0.value' => [$isHookPing ? 'required' : 'nullable', 'string'],
         ];
     }
 }

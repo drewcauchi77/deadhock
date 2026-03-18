@@ -8,8 +8,13 @@ final readonly class PlayerApiService
 {
     public function __construct(private DeadlockApiService $deadlockApiService) {}
 
-    public function getMatchHistory(string $accountId, int $value): void
+    /**
+     * @note Stub can be found at stubs/MatchHistory
+     *
+     * @return array<mixed>|null
+     */
+    public function getMatchHistory(string $accountId): ?array
     {
-        $this->deadlockApiService->get(sprintf('players/%d/match-history', $accountId), $value);
+        return $this->deadlockApiService->get(sprintf('players/%s/match-history', $accountId));
     }
 }

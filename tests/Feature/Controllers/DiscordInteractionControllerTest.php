@@ -20,9 +20,14 @@ it('creates a subscription and returns success for a subscription interaction', 
         'type' => 2,
         'guild_id' => 'guild-123',
         'channel_id' => 'channel-456',
+        'data' => [
+            'options' => [
+                ['value' => '76561198000:TestPlayer'],
+            ],
+        ],
     ])
         ->assertSuccessful()
-        ->assertExactJson(['test' => true]);
+        ->assertJsonFragment(['type' => 4]);
 
     expect(Subscription::query()->count())->toBe(1);
 });

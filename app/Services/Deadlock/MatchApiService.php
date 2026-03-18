@@ -8,8 +8,13 @@ final readonly class MatchApiService
 {
     public function __construct(private DeadlockApiService $deadlockApiService) {}
 
-    public function getMatchMetadata(string $matchId, int $value): void
+    /**
+     * @note Stub can be found at stubs/MatchMetadata
+     *
+     * @return array<mixed>|null
+     */
+    public function getMatchMetadata(string $matchId): ?array
     {
-        $this->deadlockApiService->get(sprintf('matches/%d/metadata', $matchId), $value);
+        return $this->deadlockApiService->get(sprintf('matches/%s/metadata', $matchId));
     }
 }

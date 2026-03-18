@@ -16,23 +16,25 @@ final readonly class DeadlockApiService
         'timeout' => 10,
     ])) {}
 
-    public function get(string $path, int $value): void
+    /** @return array<mixed>|null */
+    public function get(string $path): ?array
     {
         try {
             $response = $this->client->get($path);
 
-            $decoded = json_decode(
+            /** @var array<mixed> */
+            return json_decode(
                 json: $response->getBody()->getContents(),
                 associative: true,
                 flags: JSON_THROW_ON_ERROR,
             );
-
-            Log::info('Deadlock API request successful '.$value, (array) json_encode($decoded));
         } catch (GuzzleException|JsonException $e) {
-            Log::error('Deadlock API request failed '.$value, [
+            Log::error('Deadlock API request failed', [
                 'path' => $path,
                 'error' => $e->getMessage(),
             ]);
+
+            return null;
         }
     }
 }

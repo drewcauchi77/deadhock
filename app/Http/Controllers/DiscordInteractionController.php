@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Player\ParsePlayerAction;
+use App\Actions\Player\StorePlayerAction;
+use App\Actions\PlayerSubscription\StorePlayerSubscriptionAction;
 use App\Actions\Subscription\StoreSubscriptionAction;
 use App\Actions\VerifyDiscordInteractionAction;
 use App\DTO\SubscriptionDTO;
@@ -14,21 +17,38 @@ use Illuminate\Support\Facades\Log;
 final class DiscordInteractionController extends Controller
 {
     public function invoke(
-        StoreSubscriptionRequest $storeDiscordSubscriptionRequest,
+        StoreSubscriptionRequest $storeSubscriptionRequest,
         VerifyDiscordInteractionAction $verifyDiscordInteractionAction,
-        StoreSubscriptionAction $createDiscordSubscriptionAction,
+        StoreSubscriptionAction $storeSubscriptionAction,
+        ParsePlayerAction $parsePlayerAction,
+        StorePlayerAction $storePlayerAction,
+        StorePlayerSubscriptionAction $storePlayerSubscriptionAction,
     ): JsonResponse {
-        if (($response = $verifyDiscordInteractionAction->handle($storeDiscordSubscriptionRequest)) instanceof JsonResponse) {
+        if (($response = $verifyDiscordInteractionAction->handle($storeSubscriptionRequest)) instanceof JsonResponse) {
             return $response;
         }
 
-        $createDiscordSubscriptionAction->handle(new SubscriptionDTO(
-            $storeDiscordSubscriptionRequest->string('channel_id')->toString(),
-            $storeDiscordSubscriptionRequest->string('guild_id')->toString(),
+        Log::info($storeSubscriptionRequest);
+
+        $storedSubscription = $storeSubscriptionAction->handle(new SubscriptionDTO(
+            $storeSubscriptionRequest->string('channel_id')->toString(),
+            $storeSubscriptionRequest->string('guild_id')->toString(),
         ));
 
-        Log::info($storeDiscordSubscriptionRequest);
+        $players = $parsePlayerAction->handle(
+            $storeSubscriptionRequest->string('data.options.0.value')->toString(),
+        );
 
-        return response()->json(['test' => true]);
+        foreach ($players as $player) {
+            $storedPlayer = $storePlayerAction->handle($player);
+            $storePlayerSubscriptionAction->handle($storedSubscription, $storedPlayer, $player);
+        }
+
+        return response()->json([
+            'type' => 4,
+            'data' => [
+                'content' => sprintf('Now tracking %d player(s) in this channel.', count($players)),
+            ],
+        ]);
     }
 }
