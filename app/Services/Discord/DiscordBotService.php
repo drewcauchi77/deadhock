@@ -37,6 +37,40 @@ final readonly class DiscordBotService
         );
     }
 
+    public function postMatchToChannel(string $channelId, string $screenshotPath, string $messageContent): void
+    {
+        $apiBase = config('discord.api_base');
+        $token = config('discord.token');
+        assert(is_string($apiBase) && is_string($token));
+
+        try {
+            $this->client->post(
+                sprintf('%s/channels/%s/messages', $apiBase, $channelId),
+                [
+                    'headers' => [
+                        'Authorization' => 'Bot '.$token,
+                    ],
+                    'multipart' => [
+                        [
+                            'name' => 'content',
+                            'contents' => $messageContent,
+                        ],
+                        [
+                            'name' => 'files[0]',
+                            'contents' => fopen($screenshotPath, 'r'),
+                            'filename' => 'match.png',
+                        ],
+                    ],
+                ],
+            );
+        } catch (GuzzleException $guzzleException) {
+            Log::error('Failed to send match result to Discord', [
+                'channel_id' => $channelId,
+                'error' => $guzzleException->getMessage(),
+            ]);
+        }
+    }
+
     /**
      * @param  array<string, string>  $logContext
      */

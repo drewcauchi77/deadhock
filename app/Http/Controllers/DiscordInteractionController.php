@@ -31,8 +31,8 @@ final class DiscordInteractionController extends Controller
         Log::info($storeSubscriptionRequest);
 
         $storedSubscription = $storeSubscriptionAction->handle(new SubscriptionDTO(
-            $storeSubscriptionRequest->string('channel_id')->toString(),
             $storeSubscriptionRequest->string('guild_id')->toString(),
+            $storeSubscriptionRequest->string('channel_id')->toString(),
         ));
 
         $players = $parsePlayerAction->handle(
