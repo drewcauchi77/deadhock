@@ -21,12 +21,18 @@ final class ScreenshotMatchAction
         $directory = storage_path('app/private/screenshots');
         File::ensureDirectoryExists($directory);
 
-        $path = sprintf('%s/match_%s_%d.png', $directory, $match->match_id, $subscription->id);
+        $path = sprintf('%s/match_%s_%s.png', $directory, $match->match_id, $subscription->id);
 
-        Browsershot::url($url)
-            ->windowSize(1248, 1032)
+        $this->createBrowsershot($url)
+            ->windowSize(1248, 1056)
             ->save($path);
 
         return $path;
+    }
+
+    /** @noRector */
+    protected function createBrowsershot(string $url): Browsershot
+    {
+        return Browsershot::url($url);
     }
 }

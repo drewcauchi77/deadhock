@@ -14,6 +14,7 @@ final readonly class PostMatchToSubscriptionsAction
 {
     public function __construct(
         private ScreenshotMatchAction $screenshotMatchAction,
+        private BuildMatchMessageAction $buildMatchMessageAction,
         private DiscordBotService $discordBotService,
     ) {}
 
@@ -33,10 +34,12 @@ final readonly class PostMatchToSubscriptionsAction
 
             $imagePath = $this->screenshotMatchAction->handle($match, $subscription);
 
+            $message = $this->buildMatchMessageAction->handle($match, $subscription);
+
             $this->discordBotService->postMatchToChannel(
                 $subscription->channel_id,
                 $imagePath,
-                sprintf('Match #%s results', $match->match_id),
+                $message,
             );
 
             try {

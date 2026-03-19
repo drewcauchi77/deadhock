@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('player_subscription', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('subscription_id')->constrained()->cascadeOnDelete();
             $table->foreignId('player_id')->constrained()->cascadeOnDelete();
             $table->string('nice_name', 64);
             $table->unique(['subscription_id', 'player_id']);

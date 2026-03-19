@@ -12,7 +12,6 @@ use App\Actions\VerifyDiscordInteractionAction;
 use App\DTO\SubscriptionDTO;
 use App\Http\Requests\StoreSubscriptionRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 final class DiscordInteractionController extends Controller
 {
@@ -27,8 +26,6 @@ final class DiscordInteractionController extends Controller
         if (($response = $verifyDiscordInteractionAction->handle($storeSubscriptionRequest)) instanceof JsonResponse) {
             return $response;
         }
-
-        Log::info($storeSubscriptionRequest);
 
         $storedSubscription = $storeSubscriptionAction->handle(new SubscriptionDTO(
             $storeSubscriptionRequest->string('guild_id')->toString(),

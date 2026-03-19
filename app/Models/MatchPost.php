@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $match_id
  * @property int $player_id
- * @property int $subscription_id
+ * @property string $subscription_id
  * @property string|null $discord_message_id
  * @property Carbon $posted_at
  * @property Carbon|null $created_at

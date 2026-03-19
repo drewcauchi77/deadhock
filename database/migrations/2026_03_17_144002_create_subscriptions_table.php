@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('subscriptions', function (Blueprint $table): void {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('guild_id');
             $table->string('channel_id');
             $table->unique(['guild_id', 'channel_id']);

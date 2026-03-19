@@ -14,7 +14,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('match_id')->constrained('matches')->cascadeOnDelete();
             $table->foreignId('player_id')->constrained();
-            $table->foreignId('subscription_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('subscription_id')->constrained()->cascadeOnDelete();
             $table->string('discord_message_id', 32)->nullable();
             $table->timestamp('posted_at')->useCurrent();
             $table->unique(['match_id', 'subscription_id']);

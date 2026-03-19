@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int $id
- * @property int $subscription_id
+ * @property string $subscription_id
  * @property int $player_id
  * @property string $nice_name
  * @property Carbon|null $created_at

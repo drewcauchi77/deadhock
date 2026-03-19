@@ -85,3 +85,41 @@ it('logs an error with guild context when the guild command request fails', func
 
     $service->registerGuildCommand('guild-456');
 });
+
+it('posts match screenshot to the correct channel url', function (): void {
+    $tmpFile = tempnam(sys_get_temp_dir(), 'test_screenshot');
+    file_put_contents($tmpFile, 'fake image');
+
+    $history = [];
+    $service = makeServiceWithHistory([new Response(200)], $history);
+
+    $service->postMatchToChannel('channel-789', $tmpFile, 'Ace won a game.');
+
+    expect($history)->toHaveCount(1)
+        ->and((string) $history[0]['request']->getUri())
+        ->toBe('https://discord.test/api/channels/channel-789/messages')
+        ->and($history[0]['request']->getHeaderLine('Authorization'))
+        ->toBe('Bot bot-token');
+
+    unlink($tmpFile);
+});
+
+it('logs an error when posting match to channel fails', function (): void {
+    $tmpFile = tempnam(sys_get_temp_dir(), 'test_screenshot');
+    file_put_contents($tmpFile, 'fake image');
+
+    Log::shouldReceive('error')
+        ->once()
+        ->with('Failed to send match result to Discord', Mockery::subset([
+            'channel_id' => 'channel-789',
+        ]));
+
+    $history = [];
+    $service = makeServiceWithHistory([
+        new RequestException('connection error', new Request('POST', 'test')),
+    ], $history);
+
+    $service->postMatchToChannel('channel-789', $tmpFile, 'Ace won a game.');
+
+    unlink($tmpFile);
+});

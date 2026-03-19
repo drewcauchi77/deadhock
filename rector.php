@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector;
 use Rector\Renaming\Rector\Name\RenameClassRector;
 use RectorLaravel\Rector\ClassMethod\AddGenericReturnTypeToRelationsRector;
 use RectorLaravel\Set\LaravelSetList;
@@ -47,6 +48,9 @@ return RectorConfig::configure()
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
         RenameClassRector::class,
+        PrivatizeFinalClassMethodRector::class => [
+            '*/Actions/Matches/ScreenshotMatchAction.php',
+        ],
     ])
     ->withConfiguredRule(RenameClassRector::class, [
         'Livewire\Volt\Component' => 'Livewire\Component',

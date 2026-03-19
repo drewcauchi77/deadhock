@@ -26,7 +26,8 @@
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #4dd2f7aa;">K</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #4dd2f7aa;">D</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #4dd2f7aa;">A</th>
-                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">Damage</th>
+                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">Souls</th>
+                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">Player Damage</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">Healing</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">CS</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #4dd2f7aa;">Denies</th>
@@ -53,6 +54,7 @@
                             <td class="px-5 py-3 text-center font-bold" style="color: #66bb6a;">{{ $player['kills'] }}</td>
                             <td class="px-5 py-3 text-center font-bold" style="color: #ef5350;">{{ $player['deaths'] }}</td>
                             <td class="px-5 py-3 text-center font-bold" style="color: #fdd835;">{{ $player['assists'] }}</td>
+                            <td class="px-5 py-3 text-right font-medium" style="color: #ce93d8;">{{ number_format($player['net_worth']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #ffab91;">{{ number_format($player['player_damage']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #80cbc4;">{{ number_format($player['player_healing']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #b0bec5;">{{ number_format($player['last_hits']) }}</td>
@@ -76,7 +78,8 @@
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #f4b008aa;">K</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #f4b008aa;">D</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-center" style="color: #f4b008aa;">A</th>
-                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">Damage</th>
+                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">Souls</th>
+                        <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">Player Damage</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">Healing</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">CS</th>
                         <th class="px-5 py-2.5 font-semibold text-xs uppercase tracking-wider text-right" style="color: #f4b008aa;">Denies</th>
@@ -103,6 +106,7 @@
                             <td class="px-5 py-3 text-center font-bold" style="color: #66bb6a;">{{ $player['kills'] }}</td>
                             <td class="px-5 py-3 text-center font-bold" style="color: #ef5350;">{{ $player['deaths'] }}</td>
                             <td class="px-5 py-3 text-center font-bold" style="color: #fdd835;">{{ $player['assists'] }}</td>
+                            <td class="px-5 py-3 text-right font-medium" style="color: #ce93d8;">{{ number_format($player['net_worth']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #ffab91;">{{ number_format($player['player_damage']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #80cbc4;">{{ number_format($player['player_healing']) }}</td>
                             <td class="px-5 py-3 text-right font-medium" style="color: #b0bec5;">{{ number_format($player['last_hits']) }}</td>

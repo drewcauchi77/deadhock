@@ -16,6 +16,7 @@
         "spatie/browsershot": "^5.2"
     },
     "require-dev": {
+        "dg/bypass-finals": "^1.9",
         "driftingly/rector-laravel": "^2.1.12",
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.9.3",
@@ -65,12 +66,12 @@
             "@php artisan migrate --force"
         ],
         "lint": [
-            "./vendor/bin/pint --parallel",
-            "./vendor/bin/rector"
+            "./vendor/bin/rector",
+            "./vendor/bin/pint --parallel"
         ],
         "t:lint": [
-            "./vendor/bin/pint --parallel --test",
-            "./vendor/bin/rector --dry-run"
+            "./vendor/bin/rector --dry-run",
+            "./vendor/bin/pint --parallel --test"
         ],
         "t:unit": "./vendor/bin/pest --parallel --coverage --exactly=100.0",
         "t:types": "./vendor/bin/phpstan analyse --memory-limit=2G",
