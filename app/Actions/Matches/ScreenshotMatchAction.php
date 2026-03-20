@@ -30,7 +30,11 @@ final class ScreenshotMatchAction
         return $path;
     }
 
-    /** @noRector */
+    /**
+     * @noRector
+     *
+     * @codeCoverageIgnore
+     */
     protected function createBrowsershot(string $url): Browsershot
     {
         return Browsershot::url($url);
