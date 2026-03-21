@@ -49,7 +49,8 @@ return RectorConfig::configure()
         AddOverrideAttributeToOverriddenMethodsRector::class,
         RenameClassRector::class,
         PrivatizeFinalClassMethodRector::class => [
-            '*/Actions/Matches/ScreenshotMatchAction.php',
+            '*/Actions/Matches/Screenshot/*',
+            '*/Actions/Matches/Message/*',
         ],
     ])
     ->withConfiguredRule(RenameClassRector::class, [

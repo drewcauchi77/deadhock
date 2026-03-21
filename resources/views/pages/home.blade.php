@@ -111,6 +111,32 @@
         </div>
     </section>
 
+    {{-- Notices --}}
+    <section class="relative border-t border-gray-800/60 bg-gray-950">
+        <div class="mx-auto max-w-5xl px-6 py-24 sm:py-32">
+            <h2 class="text-center text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">Good to know</h2>
+
+            <div class="mt-14 grid gap-6 sm:grid-cols-2">
+                <div class="rounded-2xl border border-gray-800/60 bg-gray-900/20 p-8">
+                    <h3 class="text-base font-semibold text-white">Match delays</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                        The Deadlock API is not updated frequently, so matches may take a while to appear after they finish.
+                        If you need faster or prioritised match fetching, check out
+                        <a href="https://deadlock-api.com/" target="_blank" class="text-[#4dd2f7] underline underline-offset-2 hover:text-[#5865F2]">deadlock-api.com</a>.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl border border-gray-800/60 bg-gray-900/20 p-8">
+                    <h3 class="text-base font-semibold text-white">Found an issue?</h3>
+                    <p class="mt-2 text-sm leading-relaxed text-gray-400">
+                        If something isn't working right or you have a suggestion, please open an issue on the
+                        <a href="https://github.com/drewcauchi77/deadhock/issues" target="_blank" class="text-[#4dd2f7] underline underline-offset-2 hover:text-[#5865F2]">GitHub repository</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- CTA --}}
     <section class="relative border-t border-gray-800/60 bg-gray-950">
         <div class="mx-auto max-w-5xl px-6 py-24 text-center sm:py-32">

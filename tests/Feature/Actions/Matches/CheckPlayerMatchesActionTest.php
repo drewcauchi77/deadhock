@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Matches\CheckPlayerMatchesAction;
 use App\Actions\Matches\FetchAndCacheMatchAction;
-use App\Actions\Matches\PostMatchToSubscriptionsAction;
+use App\Actions\Matches\SendToSubscriptionsAction;
 use App\Models\Matches;
 use App\Models\Player;
 use App\Models\Subscription;
@@ -61,7 +61,7 @@ it('only processes latest match on first poll', function (): void {
         return $match;
     });
 
-    $mockPost = mock(PostMatchToSubscriptionsAction::class);
+    $mockPost = mock(SendToSubscriptionsAction::class);
     $mockPost->shouldReceive('handle')->once();
 
     resolve(CheckPlayerMatchesAction::class)->handle($player);
@@ -69,7 +69,7 @@ it('only processes latest match on first poll', function (): void {
     expect($player->fresh()->last_checked_at)->not->toBeNull();
 });
 
-it('skips existing matches and continues processing', function (): void {
+it('stops at existing match and only processes newer ones', function (): void {
     $player = Player::factory()->create();
     $subscription = Subscription::factory()->create();
     $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
@@ -85,10 +85,9 @@ it('skips existing matches and continues processing', function (): void {
 
     $mockFetch = mock(FetchAndCacheMatchAction::class);
     $mockFetch->shouldReceive('handle')->once()->with('201')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '201']));
-    $mockFetch->shouldReceive('handle')->once()->with('199')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '199']));
 
-    $mockPost = mock(PostMatchToSubscriptionsAction::class);
-    $mockPost->shouldReceive('handle')->twice();
+    $mockPost = mock(SendToSubscriptionsAction::class);
+    $mockPost->shouldReceive('handle')->once();
 
     resolve(CheckPlayerMatchesAction::class)->handle($player);
 });
@@ -98,11 +97,14 @@ it('posts matches oldest first', function (): void {
     $subscription = Subscription::factory()->create();
     $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
 
+    Matches::factory()->create(['match_id' => '500']);
+
     mock(PlayerApiService::class)
         ->shouldReceive('getMatchHistory')->once()->andReturn([
             ['match_id' => 503],
             ['match_id' => 502],
             ['match_id' => 501],
+            ['match_id' => 500],
         ]);
 
     /** @var list<string> $postOrder */
@@ -113,7 +115,7 @@ it('posts matches oldest first', function (): void {
     $mockFetch->shouldReceive('handle')->with('502')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '502']));
     $mockFetch->shouldReceive('handle')->with('501')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '501']));
 
-    $mockPost = mock(PostMatchToSubscriptionsAction::class);
+    $mockPost = mock(SendToSubscriptionsAction::class);
     $mockPost->shouldReceive('handle')->times(3)->andReturnUsing(function (Matches $match) use (&$postOrder): void {
         $postOrder[] = $match->match_id;
     });
@@ -128,17 +130,20 @@ it('creates a match record when fetch returns null to avoid retrying', function 
     $subscription = Subscription::factory()->create();
     $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
 
+    Matches::factory()->create(['match_id' => '299']);
+
     mock(PlayerApiService::class)
         ->shouldReceive('getMatchHistory')->once()->andReturn([
             ['match_id' => 301],
             ['match_id' => 300],
+            ['match_id' => 299],
         ]);
 
     $mockFetch = mock(FetchAndCacheMatchAction::class);
     $mockFetch->shouldReceive('handle')->with('301')->andReturnNull();
     $mockFetch->shouldReceive('handle')->with('300')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '300']));
 
-    $mockPost = mock(PostMatchToSubscriptionsAction::class);
+    $mockPost = mock(SendToSubscriptionsAction::class);
     $mockPost->shouldReceive('handle')->once();
 
     resolve(CheckPlayerMatchesAction::class)->handle($player);
@@ -159,7 +164,7 @@ it('updates last_checked_at after processing', function (): void {
     mock(FetchAndCacheMatchAction::class)
         ->shouldReceive('handle')->once()->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '400']));
 
-    mock(PostMatchToSubscriptionsAction::class)
+    mock(SendToSubscriptionsAction::class)
         ->shouldReceive('handle')->once();
 
     resolve(CheckPlayerMatchesAction::class)->handle($player);

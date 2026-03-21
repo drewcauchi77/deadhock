@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\DiscordInteractionController;
 use App\Http\Middleware\VerifyDiscordSignature;
 use App\Livewire\Pages\Home;
+use App\Livewire\Pages\Matches\Mvp;
 use App\Livewire\Pages\Matches\Show;
 use App\Livewire\Pages\Privacy;
 use App\Livewire\Pages\Terms;
@@ -20,3 +21,6 @@ Route::post('/discord/interactions', [DiscordInteractionController::class, 'invo
 
 Route::livewire('/matches/{matchId}/{subscription}', Show::class)
     ->name('matches.show');
+
+Route::livewire('/matches/{matchId}/{subscription}/mvp', Mvp::class)
+    ->name('matches.mvp');

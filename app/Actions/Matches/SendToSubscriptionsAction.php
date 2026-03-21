@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace App\Actions\Matches;
 
+use App\Actions\Matches\Message\CreateMatchMessageAction;
+use App\Actions\Matches\Message\CreateMvpMessageAction;
+use App\Actions\Matches\Screenshot\ScreenshotMatchAction;
+use App\Actions\Matches\Screenshot\ScreenshotMvpAction;
 use App\Models\Matches;
 use App\Models\MatchPost;
 use App\Models\Subscription;
 use App\Services\Discord\DiscordBotService;
 use Illuminate\Database\UniqueConstraintViolationException;
 
-final readonly class PostMatchToSubscriptionsAction
+final readonly class SendToSubscriptionsAction
 {
     public function __construct(
         private ScreenshotMatchAction $screenshotMatchAction,
-        private BuildMatchMessageAction $buildMatchMessageAction,
+        private ScreenshotMvpAction $screenshotMvpAction,
+        private CreateMatchMessageAction $createMatchMessageAction,
+        private CreateMvpMessageAction $createMvpMessageAction,
         private DiscordBotService $discordBotService,
     ) {}
 
@@ -34,13 +40,25 @@ final readonly class PostMatchToSubscriptionsAction
 
             $imagePath = $this->screenshotMatchAction->handle($match, $subscription);
 
-            $message = $this->buildMatchMessageAction->handle($match, $subscription);
+            $message = $this->createMatchMessageAction->handle($match, $subscription);
 
             $this->discordBotService->postMatchToChannel(
                 $subscription->channel_id,
                 $imagePath,
                 $message,
             );
+
+            $mvpMessage = $this->createMvpMessageAction->handle($match, $subscription);
+
+            if ($mvpMessage !== '') {
+                $mvpPath = $this->screenshotMvpAction->handle($match, $subscription);
+
+                $this->discordBotService->postMatchToChannel(
+                    $subscription->channel_id,
+                    $mvpPath,
+                    $mvpMessage,
+                );
+            }
 
             try {
                 MatchPost::query()->create([

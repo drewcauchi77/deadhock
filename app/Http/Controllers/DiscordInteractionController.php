@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Discord\VerifyDiscordInteractionAction;
 use App\Actions\Player\ParsePlayerAction;
 use App\Actions\Player\StorePlayerAction;
 use App\Actions\PlayerSubscription\StorePlayerSubscriptionAction;
 use App\Actions\Subscription\StoreSubscriptionAction;
-use App\Actions\VerifyDiscordInteractionAction;
 use App\DTO\SubscriptionDTO;
 use App\Http\Requests\StoreSubscriptionRequest;
 use Illuminate\Http\JsonResponse;

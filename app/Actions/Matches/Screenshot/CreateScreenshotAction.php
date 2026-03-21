@@ -2,18 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\Matches;
+namespace App\Actions\Matches\Screenshot;
 
 use App\Models\Matches;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\File;
 use Spatie\Browsershot\Browsershot;
 
-final class ScreenshotMatchAction
+trait CreateScreenshotAction
 {
-    public function handle(Matches $match, Subscription $subscription): string
-    {
-        $url = route('matches.show', [
+    protected function screenshot(
+        Matches $match,
+        Subscription $subscription,
+        string $routeName,
+        string $filePrefix,
+        int $width,
+        int $height,
+    ): string {
+        $url = route($routeName, [
             'matchId' => $match->match_id,
             'subscription' => $subscription->id,
         ]);
@@ -21,10 +27,10 @@ final class ScreenshotMatchAction
         $directory = storage_path('app/private/screenshots');
         File::ensureDirectoryExists($directory);
 
-        $path = sprintf('%s/match_%s_%s.png', $directory, $match->match_id, $subscription->id);
+        $path = sprintf('%s/%s_%s_%s.png', $directory, $filePrefix, $match->match_id, $subscription->id);
 
         $this->createBrowsershot($url)
-            ->windowSize(1248, 1056)
+            ->windowSize($width, $height)
             ->save($path);
 
         return $path;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Actions\VerifyDiscordInteractionAction;
+use App\Actions\Discord\VerifyDiscordInteractionAction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

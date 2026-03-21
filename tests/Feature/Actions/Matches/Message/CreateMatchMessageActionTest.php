@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Actions\Matches\BuildMatchMessageAction;
+use App\Actions\Matches\Message\CreateMatchMessageAction;
 use App\Models\Matches;
 use App\Models\Player;
 use App\Models\Subscription;
@@ -12,7 +12,7 @@ it('returns fallback message when cache is empty', function (): void {
     $match = Matches::factory()->create(['match_id' => '12345']);
     $subscription = Subscription::factory()->create();
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, [1 => ['id' => 1, 'name' => 'Infernus']]);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, [1 => ['id' => 1, 'name' => 'Infernus']]);
 
     expect($result)->toBe('Match #12345 results');
 });
@@ -30,7 +30,7 @@ it('returns fallback message when no tracked players in match', function (): voi
         ],
     ]);
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, [1 => ['id' => 1, 'name' => 'Infernus']]);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, [1 => ['id' => 1, 'name' => 'Infernus']]);
 
     expect($result)->toBe('Match #12345 results');
 });
@@ -51,7 +51,7 @@ it('builds message for single tracked player who won', function (): void {
     ]);
 
     $heroes = [1 => ['id' => 1, 'name' => 'Infernus']];
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, $heroes);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, $heroes);
 
     expect($result)->toBe('Ace (playing as Infernus) won a game.');
 });
@@ -72,7 +72,7 @@ it('builds message for single tracked player who lost', function (): void {
     ]);
 
     $heroes = [1 => ['id' => 1, 'name' => 'Infernus']];
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, $heroes);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, $heroes);
 
     expect($result)->toBe('Ace (playing as Infernus) lost a game.');
 });
@@ -102,7 +102,7 @@ it('builds combined message for two tracked players with same outcome', function
         2 => ['id' => 2, 'name' => 'Seven'],
     ];
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, $heroes);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, $heroes);
 
     expect($result)->toBe('Ace (playing as Infernus) and Bromar (playing as Seven) won a game.');
 });
@@ -132,7 +132,7 @@ it('builds separate lines for tracked players with different outcomes', function
         2 => ['id' => 2, 'name' => 'Seven'],
     ];
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, $heroes);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, $heroes);
 
     expect($result)->toBe("Ace (playing as Infernus) won a game.\nBromar (playing as Seven) lost a game.");
 });
@@ -167,7 +167,7 @@ it('builds message with three tracked players using comma and', function (): voi
         3 => ['id' => 3, 'name' => 'Vindicta'],
     ];
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, $heroes);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, $heroes);
 
     expect($result)->toBe('Ace (playing as Infernus), Bromar (playing as Seven) and Charlie (playing as Vindicta) won a game.');
 });
@@ -187,7 +187,7 @@ it('uses Unknown for missing hero data', function (): void {
         ],
     ]);
 
-    $result = resolve(BuildMatchMessageAction::class)->handle($match, $subscription, []);
+    $result = resolve(CreateMatchMessageAction::class)->handle($match, $subscription, []);
 
     expect($result)->toContain('playing as Unknown');
 });

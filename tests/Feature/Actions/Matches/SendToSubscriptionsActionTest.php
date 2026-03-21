@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Actions\Matches\BuildMatchMessageAction;
-use App\Actions\Matches\PostMatchToSubscriptionsAction;
-use App\Actions\Matches\ScreenshotMatchAction;
+use App\Actions\Matches\Message\CreateMatchMessageAction;
+use App\Actions\Matches\Message\CreateMvpMessageAction;
+use App\Actions\Matches\Screenshot\ScreenshotMatchAction;
+use App\Actions\Matches\Screenshot\ScreenshotMvpAction;
+use App\Actions\Matches\SendToSubscriptionsAction;
 use App\Models\Matches;
 use App\Models\MatchPlayer;
 use App\Models\MatchPost;
@@ -25,15 +27,18 @@ it('posts match to subscriptions with tracked players', function (): void {
     mock(ScreenshotMatchAction::class)
         ->shouldReceive('handle')->once()->andReturn('/tmp/screenshot.png');
 
-    mock(BuildMatchMessageAction::class)
+    mock(CreateMatchMessageAction::class)
         ->shouldReceive('handle')->once()->andReturn('Ace (playing as Infernus) won a game.');
+
+    mock(CreateMvpMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('');
 
     mock(DiscordBotService::class)
         ->shouldReceive('postMatchToChannel')->once()->withArgs(fn (string $channelId, string $path, string $message): bool => $channelId === $subscription->channel_id
             && $path === '/tmp/screenshot.png'
             && $message === 'Ace (playing as Infernus) won a game.');
 
-    resolve(PostMatchToSubscriptionsAction::class)->handle($match);
+    resolve(SendToSubscriptionsAction::class)->handle($match);
 
     expect(MatchPost::query()->count())->toBe(1);
 });
@@ -53,10 +58,11 @@ it('skips subscription that already has a match post', function (): void {
     ]);
 
     mock(ScreenshotMatchAction::class)->shouldNotReceive('handle');
-    mock(BuildMatchMessageAction::class)->shouldNotReceive('handle');
+    mock(CreateMatchMessageAction::class)->shouldNotReceive('handle');
+    mock(CreateMvpMessageAction::class)->shouldNotReceive('handle');
     mock(DiscordBotService::class)->shouldNotReceive('postMatchToChannel');
 
-    resolve(PostMatchToSubscriptionsAction::class)->handle($match);
+    resolve(SendToSubscriptionsAction::class)->handle($match);
 
     expect(MatchPost::query()->count())->toBe(1);
 });
@@ -69,10 +75,11 @@ it('does not post to subscriptions without tracked players in the match', functi
     $match = Matches::factory()->create();
 
     mock(ScreenshotMatchAction::class)->shouldNotReceive('handle');
-    mock(BuildMatchMessageAction::class)->shouldNotReceive('handle');
+    mock(CreateMatchMessageAction::class)->shouldNotReceive('handle');
+    mock(CreateMvpMessageAction::class)->shouldNotReceive('handle');
     mock(DiscordBotService::class)->shouldNotReceive('postMatchToChannel');
 
-    resolve(PostMatchToSubscriptionsAction::class)->handle($match);
+    resolve(SendToSubscriptionsAction::class)->handle($match);
 
     expect(MatchPost::query()->count())->toBe(0);
 });
@@ -96,13 +103,16 @@ it('handles race condition when match post is created between exists check and i
             return '/tmp/screenshot.png';
         });
 
-    mock(BuildMatchMessageAction::class)
+    mock(CreateMatchMessageAction::class)
         ->shouldReceive('handle')->once()->andReturn('Ace won a game.');
+
+    mock(CreateMvpMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('');
 
     mock(DiscordBotService::class)
         ->shouldReceive('postMatchToChannel')->once();
 
-    resolve(PostMatchToSubscriptionsAction::class)->handle($match);
+    resolve(SendToSubscriptionsAction::class)->handle($match);
 
     expect(MatchPost::query()->count())->toBe(1);
 });
@@ -120,13 +130,57 @@ it('posts to multiple subscriptions with shared players', function (): void {
     mock(ScreenshotMatchAction::class)
         ->shouldReceive('handle')->twice()->andReturn('/tmp/screenshot.png');
 
-    mock(BuildMatchMessageAction::class)
+    mock(CreateMatchMessageAction::class)
         ->shouldReceive('handle')->twice()->andReturn('Player won a game.');
+
+    mock(CreateMvpMessageAction::class)
+        ->shouldReceive('handle')->twice()->andReturn('');
 
     mock(DiscordBotService::class)
         ->shouldReceive('postMatchToChannel')->twice();
 
-    resolve(PostMatchToSubscriptionsAction::class)->handle($match);
+    resolve(SendToSubscriptionsAction::class)->handle($match);
 
     expect(MatchPost::query()->count())->toBe(2);
+});
+
+it('posts mvp screenshot when tracked players have mvp ranks', function (): void {
+    $subscription = Subscription::factory()->create();
+    $player = Player::factory()->create();
+    $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
+
+    $match = Matches::factory()->create();
+    MatchPlayer::factory()->create(['match_id' => $match->id, 'player_id' => $player->id]);
+
+    mock(ScreenshotMatchAction::class)
+        ->shouldReceive('handle')->once()->andReturn('/tmp/screenshot.png');
+
+    mock(CreateMatchMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('Ace won a game.');
+
+    mock(CreateMvpMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('Ace (playing as Infernus) was the MVP.');
+
+    mock(ScreenshotMvpAction::class)
+        ->shouldReceive('handle')->once()->andReturn('/tmp/mvp.png');
+
+    mock(DiscordBotService::class)
+        ->shouldReceive('postMatchToChannel')->twice();
+
+    resolve(SendToSubscriptionsAction::class)->handle($match);
+
+    expect(MatchPost::query()->count())->toBe(1);
+});
+
+it('does nothing when no subscriptions exist', function (): void {
+    $match = Matches::factory()->create();
+
+    mock(ScreenshotMatchAction::class)->shouldNotReceive('handle');
+    mock(CreateMatchMessageAction::class)->shouldNotReceive('handle');
+    mock(CreateMvpMessageAction::class)->shouldNotReceive('handle');
+    mock(DiscordBotService::class)->shouldNotReceive('postMatchToChannel');
+
+    resolve(SendToSubscriptionsAction::class)->handle($match);
+
+    expect(MatchPost::query()->count())->toBe(0);
 });
