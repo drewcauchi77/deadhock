@@ -43,7 +43,12 @@
         </section>
 
         <section>
-            <h2 class="mb-3 text-lg font-semibold text-white">8. Contact</h2>
+            <h2 class="mb-3 text-lg font-semibold text-white">8. Disclaimer</h2>
+            <p>Deadhock is an independent, community-built project and is not affiliated with, endorsed by, or associated with Valve Corporation or Deadlock in any way. All game-related data is sourced from publicly available APIs.</p>
+        </section>
+
+        <section>
+            <h2 class="mb-3 text-lg font-semibold text-white">9. Contact</h2>
             <p>For questions about these terms, reach out through our Discord support server or open an issue on GitHub.</p>
         </section>
     </div>

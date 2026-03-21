@@ -65,7 +65,10 @@
                 <div class="group rounded-2xl border border-gray-800/60 bg-gray-900/30 p-8 transition duration-300 hover:border-[#4dd2f7]/30 hover:bg-gray-900/50">
                     <div class="mb-5 flex h-10 w-10 items-center justify-center rounded-lg bg-[#4dd2f7]/10 text-sm font-bold text-[#4dd2f7]">2</div>
                     <h3 class="text-lg font-semibold text-white">Register your squad</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-gray-400">Use slash commands to register players by their Steam IDs. Give each player a nickname your server will recognize.</p>
+                    <p class="mt-2 text-sm leading-relaxed text-gray-400">Use a single slash command to register players by their Steam IDs. Give each player a nickname your server will recognize.</p>
+                    <div class="mt-4 rounded-lg bg-gray-950/80 px-4 py-3 font-mono text-xs text-gray-300">
+                        <span class="text-[#4dd2f7]">/deadhock</span> <span class="text-gray-500">164939794:</span><span class="text-[#f4b008]">Xera</span> <span class="text-gray-500">87624911:</span><span class="text-[#f4b008]">Deathy</span> <span class="text-gray-500">87241154:</span><span class="text-[#f4b008]">hoot</span>
+                    </div>
                 </div>
 
                 {{-- Step 3 --}}
