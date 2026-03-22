@@ -13,6 +13,8 @@ final class Home extends Component
 {
     public function render(): View
     {
-        return view('pages.home');
+        return view('pages.home', [
+            'app_id' => config('discord.app_id'),
+        ]);
     }
 }

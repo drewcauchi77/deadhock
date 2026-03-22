@@ -12,6 +12,7 @@ use App\Models\Matches;
 use App\Models\MatchPost;
 use App\Models\Subscription;
 use App\Services\Discord\DiscordBotService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 
 final readonly class SendToSubscriptionsAction
@@ -27,7 +28,7 @@ final readonly class SendToSubscriptionsAction
     public function handle(Matches $match): void
     {
         $subscriptions = Subscription::query()
-            ->whereHas('players', function ($query) use ($match): void {
+            ->whereHas('players', function (Builder $query) use ($match): void {
                 $query->whereIn('players.id', $match->matchPlayers()->pluck('player_id'));
             })
             ->with('players')
