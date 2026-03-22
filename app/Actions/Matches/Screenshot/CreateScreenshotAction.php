@@ -43,6 +43,16 @@ trait CreateScreenshotAction
      */
     protected function createBrowsershot(string $url): Browsershot
     {
-        return Browsershot::url($url);
+        $browsershot = Browsershot::url($url);
+
+        if ($chromePath = config('services.browsershot.chrome_path')) {
+            $browsershot->setChromePath($chromePath);
+        }
+
+        if (config('services.browsershot.no_sandbox')) {
+            $browsershot->noSandbox();
+        }
+
+        return $browsershot;
     }
 }

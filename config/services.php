@@ -37,4 +37,9 @@ return [
         ],
     ],
 
+    'browsershot' => [
+        'chrome_path' => env('BROWSERSHOT_CHROME_PATH'),
+        'no_sandbox' => env('BROWSERSHOT_NO_SANDBOX', false),
+    ],
+
 ];
