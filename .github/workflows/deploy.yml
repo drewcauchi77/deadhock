@@ -1,0 +1,56 @@
+name: Deploy Deadhock to Production Server
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install NPM Dependencies
+        run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: true
+
+      - name: Build NPM Assets
+        run: npm run build
+
+      - name: Synchronize Files To Server
+        uses: easingthemes/ssh-deploy@v5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.VPS_HOST }}
+          REMOTE_USER: ${{ secrets.VPS_USER }}
+          TARGET: "/var/www/html/deadhock"
+
+      - name: Run Post-Deploy Commands
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html/deadhock
+            php artisan config:clear
+            php artisan migrate --force
+            php artisan optimize

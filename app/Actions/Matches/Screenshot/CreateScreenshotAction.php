@@ -45,7 +45,10 @@ trait CreateScreenshotAction
     {
         $browsershot = Browsershot::url($url);
 
-        if ($chromePath = config('services.browsershot.chrome_path')) {
+        /** @var string|null $chromePath */
+        $chromePath = config('services.browsershot.chrome_path');
+
+        if ($chromePath !== null) {
             $browsershot->setChromePath($chromePath);
         }
 
