@@ -21,6 +21,23 @@ final class MatchesFactory extends Factory
             'match_id' => fake()->numerify('###########'),
             'match_started_at' => fake()->dateTimeBetween('-7 days', 'now'),
             'fetched_at' => now(),
+            'retries_left' => null,
         ];
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (): array => [
+            'retries_left' => 3,
+            'match_started_at' => null,
+        ]);
+    }
+
+    public function failed(): static
+    {
+        return $this->state(fn (): array => [
+            'retries_left' => 0,
+            'match_started_at' => null,
+        ]);
     }
 }

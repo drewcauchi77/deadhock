@@ -30,9 +30,7 @@ npm install
 npm run dev
 
 # 8) Start the PHP server (second terminal)
-php -S 0.0.0.0:80 -t public
-# Port 80 usually needs sudo; use 8000 for local dev:
-# php -S 0.0.0.0:8000 -t public
+php -S 0.0.0.0:8000 -t public
 ```
 
 Open the app at [http://localhost](http://localhost) (or `http://localhost:8000` if using port 8000).
@@ -43,6 +41,12 @@ If you need Discord to reach your local server (e.g. for interaction endpoints):
 
 ```bash
 ngrok http 8000 --domain=your-domain.ngrok-free.app
+```
+
+In my case:
+
+```bash
+ngrok http 8000 --domain=hostly-frenzied-dalene.ngrok-free.dev
 ```
 
 ## Links

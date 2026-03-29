@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Actions\Matches\PollMatchesAction;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Override;
 
 final class PollDeadlockMatchesCommand extends Command
@@ -19,9 +20,11 @@ final class PollDeadlockMatchesCommand extends Command
     public function handle(PollMatchesAction $pollMatchesAction): void
     {
         $this->info('Polling for new matches...');
+        Log::info('Polling for new matches...');
 
         $pollMatchesAction->handle();
 
         $this->info('Polling complete.');
+        Log::info('Polling complete.');
     }
 }
