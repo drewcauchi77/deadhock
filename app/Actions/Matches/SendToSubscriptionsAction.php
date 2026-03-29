@@ -14,6 +14,8 @@ use App\Models\Subscription;
 use App\Services\Discord\DiscordBotService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final readonly class SendToSubscriptionsAction
 {
@@ -39,26 +41,36 @@ final readonly class SendToSubscriptionsAction
                 continue;
             }
 
-            $imagePath = $this->screenshotMatchAction->handle($match, $subscription);
+            try {
+                $imagePath = $this->screenshotMatchAction->handle($match, $subscription);
 
-            $message = $this->createMatchMessageAction->handle($match, $subscription);
-
-            $this->discordBotService->postMatchToChannel(
-                $subscription->channel_id,
-                $imagePath,
-                $message,
-            );
-
-            $mvpMessage = $this->createMvpMessageAction->handle($match, $subscription);
-
-            if ($mvpMessage !== '') {
-                $mvpPath = $this->screenshotMvpAction->handle($match, $subscription);
+                $message = $this->createMatchMessageAction->handle($match, $subscription);
 
                 $this->discordBotService->postMatchToChannel(
                     $subscription->channel_id,
-                    $mvpPath,
-                    $mvpMessage,
+                    $imagePath,
+                    $message,
                 );
+
+                $mvpMessage = $this->createMvpMessageAction->handle($match, $subscription);
+
+                if ($mvpMessage !== '') {
+                    $mvpPath = $this->screenshotMvpAction->handle($match, $subscription);
+
+                    $this->discordBotService->postMatchToChannel(
+                        $subscription->channel_id,
+                        $mvpPath,
+                        $mvpMessage,
+                    );
+                }
+            } catch (Throwable $e) {
+                Log::error('Failed to process match for subscription', [
+                    'match_id' => $match->match_id,
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                ]);
+
+                continue;
             }
 
             try {
