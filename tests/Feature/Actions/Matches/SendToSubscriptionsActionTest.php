@@ -13,6 +13,7 @@ use App\Models\MatchPost;
 use App\Models\Player;
 use App\Models\Subscription;
 use App\Services\Discord\DiscordBotService;
+use Illuminate\Support\Facades\Log;
 
 use function Pest\Laravel\mock;
 
@@ -166,6 +167,41 @@ it('posts mvp screenshot when tracked players have mvp ranks', function (): void
 
     mock(DiscordBotService::class)
         ->shouldReceive('postMatchToChannel')->twice();
+
+    resolve(SendToSubscriptionsAction::class)->handle($match);
+
+    expect(MatchPost::query()->count())->toBe(1);
+});
+
+it('logs error and continues when screenshot fails', function (): void {
+    $sub1 = Subscription::factory()->create();
+    $sub2 = Subscription::factory()->create();
+    $player = Player::factory()->create();
+    $player->subscriptions()->attach($sub1, ['nice_name' => 'Ace']);
+    $player->subscriptions()->attach($sub2, ['nice_name' => 'Bromar']);
+
+    $match = Matches::factory()->create();
+    MatchPlayer::factory()->create(['match_id' => $match->id, 'player_id' => $player->id]);
+
+    Log::shouldReceive('error')->once()->withArgs(fn (string $message): bool => $message === 'Failed to process match for subscription');
+
+    $callCount = 0;
+    mock(ScreenshotMatchAction::class)
+        ->shouldReceive('handle')->twice()->andReturnUsing(function () use (&$callCount): string {
+            $callCount++;
+            throw_if($callCount === 1, RuntimeException::class, 'node not found');
+
+            return '/tmp/screenshot.png';
+        });
+
+    mock(CreateMatchMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('Player won a game.');
+
+    mock(CreateMvpMessageAction::class)
+        ->shouldReceive('handle')->once()->andReturn('');
+
+    mock(DiscordBotService::class)
+        ->shouldReceive('postMatchToChannel')->once();
 
     resolve(SendToSubscriptionsAction::class)->handle($match);
 

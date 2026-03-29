@@ -52,6 +52,20 @@ trait CreateScreenshotAction
             $browsershot->setChromePath($chromePath);
         }
 
+        /** @var string|null $nodeBinary */
+        $nodeBinary = config('services.browsershot.node_binary');
+
+        if ($nodeBinary !== null) {
+            $browsershot->setNodeBinary($nodeBinary);
+        }
+
+        /** @var string|null $npmBinary */
+        $npmBinary = config('services.browsershot.npm_binary');
+
+        if ($npmBinary !== null) {
+            $browsershot->setNpmBinary($npmBinary);
+        }
+
         if (config('services.browsershot.no_sandbox')) {
             $browsershot->noSandbox();
         }
