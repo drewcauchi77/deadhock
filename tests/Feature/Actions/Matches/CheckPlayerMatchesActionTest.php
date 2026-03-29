@@ -125,7 +125,7 @@ it('posts matches oldest first', function (): void {
     expect($postOrder)->toBe(['501', '502', '503']);
 });
 
-it('creates a match record when fetch returns null to avoid retrying', function (): void {
+it('creates a pending match record when fetch returns null', function (): void {
     $player = Player::factory()->create();
     $subscription = Subscription::factory()->create();
     $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
@@ -147,8 +147,6 @@ it('creates a match record when fetch returns null to avoid retrying', function 
     $mockPost->shouldReceive('handle')->once();
 
     resolve(CheckPlayerMatchesAction::class)->handle($player);
-
-    expect(Matches::query()->where('match_id', '301')->exists())->toBeTrue();
 });
 
 it('updates last_checked_at after processing', function (): void {
@@ -170,4 +168,86 @@ it('updates last_checked_at after processing', function (): void {
     resolve(CheckPlayerMatchesAction::class)->handle($player);
 
     expect($player->fresh()->last_checked_at)->not->toBeNull();
+});
+
+it('retries a pending match on next poll', function (): void {
+    $player = Player::factory()->create();
+    $subscription = Subscription::factory()->create();
+    $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
+
+    Matches::factory()->create(['match_id' => '599']);
+    Matches::factory()->pending()->create(['match_id' => '600', 'retries_left' => 2]);
+
+    mock(PlayerApiService::class)
+        ->shouldReceive('getMatchHistory')->once()->andReturn([
+            ['match_id' => 600],
+            ['match_id' => 599],
+        ]);
+
+    $mockFetch = mock(FetchAndCacheMatchAction::class);
+    $mockFetch->shouldReceive('handle')->once()->with('600')->andReturnUsing(function (): Matches {
+        $match = Matches::query()->where('match_id', '600')->first();
+        $match->update(['retries_left' => null, 'match_started_at' => now()]);
+
+        return $match->refresh();
+    });
+
+    $mockPost = mock(SendToSubscriptionsAction::class);
+    $mockPost->shouldReceive('handle')->once();
+
+    resolve(CheckPlayerMatchesAction::class)->handle($player);
+});
+
+it('skips failed matches but continues past them', function (): void {
+    $player = Player::factory()->create();
+    $subscription = Subscription::factory()->create();
+    $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
+
+    Matches::factory()->create(['match_id' => '700']);
+    Matches::factory()->failed()->create(['match_id' => '701']);
+
+    mock(PlayerApiService::class)
+        ->shouldReceive('getMatchHistory')->once()->andReturn([
+            ['match_id' => 702],
+            ['match_id' => 701],
+            ['match_id' => 700],
+        ]);
+
+    $mockFetch = mock(FetchAndCacheMatchAction::class);
+    $mockFetch->shouldReceive('handle')->once()->with('702')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '702']));
+
+    $mockPost = mock(SendToSubscriptionsAction::class);
+    $mockPost->shouldReceive('handle')->once();
+
+    resolve(CheckPlayerMatchesAction::class)->handle($player);
+});
+
+it('abandons older pending matches when a newer match succeeds', function (): void {
+    $player = Player::factory()->create();
+    $subscription = Subscription::factory()->create();
+    $player->subscriptions()->attach($subscription, ['nice_name' => 'Ace']);
+
+    Matches::factory()->create(['match_id' => '799']);
+    Matches::factory()->pending()->create(['match_id' => '800', 'retries_left' => 2]);
+
+    mock(PlayerApiService::class)
+        ->shouldReceive('getMatchHistory')->once()->andReturn([
+            ['match_id' => 802],
+            ['match_id' => 801],
+            ['match_id' => 800],
+            ['match_id' => 799],
+        ]);
+
+    $mockFetch = mock(FetchAndCacheMatchAction::class);
+    $mockFetch->shouldReceive('handle')->with('802')->andReturnUsing(fn (): Matches => Matches::factory()->create(['match_id' => '802']));
+    $mockFetch->shouldReceive('handle')->with('801')->andReturnNull();
+    $mockFetch->shouldReceive('handle')->with('800')->andReturnNull();
+
+    $mockPost = mock(SendToSubscriptionsAction::class);
+    $mockPost->shouldReceive('handle')->once();
+
+    resolve(CheckPlayerMatchesAction::class)->handle($player);
+
+    expect(Matches::query()->where('match_id', '800')->first()->retries_left)->toBe(0)
+        ->and(Matches::query()->where('match_id', '801')->exists())->toBeFalse();
 });
