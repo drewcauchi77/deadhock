@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
       - name: Synchronize Files To Server
-        uses: easingthemes/ssh-deploy@v5
+        uses: easingthemes/ssh-deploy@v2.1.5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: "."
@@ -44,7 +44,7 @@ jobs:
           TARGET: "/var/www/html/deadhock"
 
       - name: Run Post-Deploy Commands
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
