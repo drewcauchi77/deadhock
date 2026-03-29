@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $match_id
  * @property Carbon|null $match_started_at
  * @property Carbon $fetched_at
+ * @property int|null $retries_left
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Collection<int, MatchPlayer> $matchPlayers
